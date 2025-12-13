@@ -1,28 +1,38 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import './Cars.css';
-import carList from './carData';
 import Reviews from './Reviews';
 import { useNavigate } from 'react-router-dom';
 
 function Cars() {
   const [searchTerm, setSearchTerm] = useState('');
   const [flips, setFlips] = useState({});
+  const [carData, setCarData] = useState([]);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    fetch('http://localhost:8080/api/cars/display')
+      .then(response => response.json())
+      .then(data => {
+        console.log("API Response:", data);
+        setCarData(data);
+      })
+      .catch(error => console.error('Error fetching car data:', error));
+  }, []);
 
   const handleSearchBar = (e) => {
     setSearchTerm(e.target.value.toLowerCase());
   };
 
-  const toggleFlip = (index) => {
+  const toggleFlip = (id) => {
     setFlips(prev => ({
       ...prev,
-      [index]: !prev[index],
+      [id]: !prev[id],
     }));
   };
 
-  const filteredCars = carList.filter(car =>
-    car.name.toLowerCase().includes(searchTerm)
+  const filteredCars = carData.filter(car =>
+    (car.brand + " " + car.model).toLowerCase().includes(searchTerm)
   );
-  const navigate = useNavigate();
 
   const handleCardClick = (id) => {
     navigate(`/cars/${id}`);
@@ -44,56 +54,43 @@ function Cars() {
 
       <div className="container">
         {filteredCars.length > 0 ? (
-          filteredCars.map((car, index) => (
-            <div className="flip-card" key={index} >
-              <div className={`flip-card-inner ${flips[index] ? 'flipped' : ''}`} >
+          filteredCars.map((car) => (
+            <div className="flip-card" key={car.carId}>
+              <div className={`flip-card-inner ${flips[car.carId] ? 'flipped' : ''}`}>
 
-                {/* Front Side */}
-                <div className="flip-card-front"  >
-                  <div className="card-image" onClick={() => handleCardClick(car.id)}>
-                    <img src={car.image} alt={car.name} />
+                {/* FRONT SIDE */}
+                <div className="flip-card-front">
+                  <div className="card-image" onClick={() => handleCardClick(car.carId)}>
+                    <img src={car.imageUrl} alt={car.model} />
                     <div className="image-overlay">
                       <span>Click to view details</span>
                     </div>
                   </div>
 
                   <div className="card-body">
-                    <h2 className="card-title">{car.name}</h2>
-                    <div className="rating">
-                      {[...Array(5)].map((_, i) => (
-                        <span key={i} className={i < car.rating ? 'star filled' : 'star'}>
-                          {i < car.rating ? '★' : '☆'}
-                        </span>
-                      ))}
-                    </div>
+                    <h2 className="card-title">
+                      {car.brand} {car.model}
+                    </h2>
+
                     <div className="card-description">
-                      <strong>Model:</strong> {car.model}<br />
-                      <strong>Mileage:</strong> {car.mileage}<br />
-                      <strong>Fuel Type:</strong> {car.fuel}<br />
-                      <strong>Seating:</strong> {car.seats} seater<br />
-                      <strong>Status:</strong>{' '}
-                      <div className='Flipstatus'>
-                        {car.availability ? (
-                          <span className="status available">Available</span>
-                        ) : (
-                          <span className="status not-available">Not Available</span>
-                        )}
-                        <button onClick={() => toggleFlip(index)}>Show Reviews</button>
-
-                      </div>
+                      <strong>Model Year:</strong> {car.modelYear} <br />
+                      <strong>Fuel Type:</strong> {car.fuelType || "N/A"} <br />
+                      <strong>Seats:</strong> {car.seats} <br />
+                      <strong>Price/Day:</strong> ₹{car.pricePerDay} <br />
+                      <strong>Status:</strong> {car.status} <br />
+                      <button onClick={() => toggleFlip(car.carId)}>Show Reviews</button>
                     </div>
-
                   </div>
                 </div>
 
-
+                {/* BACK SIDE */}
                 <div className="flip-card-back">
                   <div className="card-body">
-                    <h2>{car.name} - Reviews </h2>
+                    <h2>{car.brand} {car.model} - Reviews</h2>
 
-                    <Reviews reviews={car.reviews} />
+                    <Reviews reviews={car.reviews || []} />
 
-                    <button onClick={() => toggleFlip(index)}>Back to Details</button>
+                    <button onClick={() => toggleFlip(car.carId)}>Back to Details</button>
                   </div>
                 </div>
 
@@ -101,7 +98,7 @@ function Cars() {
             </div>
           ))
         ) : (
-          <p className="no-results">No cars found matching your search.</p>
+          <p className="no-results">No cars found.</p>
         )}
       </div>
     </>

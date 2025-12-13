@@ -10,6 +10,9 @@ import ContactUs from "./ContactUs";
 import Admin from "./components/Admin";
 import ErrorPage from "./components/errorPage";
 import CarDetails from "./components/CarsDetails";
+import AvailableCars from "./components/Availablecars";
+import BookNow from "./components/BookNow";
+import Success from "./components/Success";
 
 const router = createBrowserRouter([
   {
@@ -43,6 +46,17 @@ const router = createBrowserRouter([
         path: "contact",
         element: <ContactUs />,
       },
+      {
+        path: "available",
+        element: <AvailableCars />,
+      },{
+        path: "book/:id",
+        element: <BookNow />,
+        
+      },{
+        path: "booking/success",
+        element: <Success/>,
+      }
     ],
   },
 ]);
