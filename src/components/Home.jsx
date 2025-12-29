@@ -29,13 +29,27 @@ const Home = () => {
     const startTime = `${pickupDate}T${pickupTime}:00`;
     const endTime = `${dropoffDate}T${pickupTime}:00`;
 
-   
+    const carLocation = location.toLowerCase();
     navigate(
-      `/available?location=${location}&start=${startTime}&end=${endTime}`
+      `/available?location=${carLocation}&start=${startTime}&end=${endTime}`
     );
   };
 
- 
+  const locations = [
+    "Indore",
+    "Bhopal",
+    "Ujjain",
+    "Dewas",
+    "Ratlam",
+    "Mumbai",
+    "Pune",
+    "Bangalore",
+    "Chennai",
+    "Hyderabad",
+    "Delhi",
+    "Gurgaon",
+    "Noida",
+  ];
   const handleBookButton = () => {
     navigate('/cars');
     setClickedNav('Cars');
@@ -43,19 +57,19 @@ const Home = () => {
 
   const handleTranslate = () => setLanguage(!language);
 
- 
+
   return (
     <div>
-      <div className="home-container"   style={{
-            backgroundImage: `url(${bgImg})`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            backgroundRepeat: 'no-repeat',
-            width: '100%',
-          }}>
+      <div className="home-container" style={{
+        backgroundImage: `url(${bgImg})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
+        width: '100%',
+      }}>
         <section
           className="car-hero"
-        
+
         >
           {/* ---------------------- BOOKING FORM ---------------------- */}
           <div className="form-overlay">
@@ -65,11 +79,18 @@ const Home = () => {
               <div className="form-group">
                 <input
                   type="text"
+                  list="locations"
                   value={location}
                   onChange={(e) => setLocation(e.target.value)}
                   placeholder="Enter location"
+
                   required
                 />
+                <datalist id="locations">
+                  {locations.map((loc) => (
+                    <option key={loc} value={loc} />
+                  ))}
+                </datalist>
               </div>
 
               <div className="form-row">
@@ -104,10 +125,10 @@ const Home = () => {
                 />
               </div>
 
-              <button type="submit" className="form-submit-btn" disabled={!isLoginedIn}
-              title={!isLoginedIn ? "Login required to check availability" : ""}
+              <button type="submit" className="form-submit-btn"
+                title={!isLoginedIn ? "Login required to check availability" : ""}
               >
-              Check Availability
+                Check Availability
               </button>
             </form>
           </div>
