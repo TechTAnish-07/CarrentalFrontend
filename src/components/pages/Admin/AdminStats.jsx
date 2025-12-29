@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import api from "/Users/tanish/web-dev/react/carrental-project/src/components/Axios.jsx";
+import api from "../../Axios.jsx";
 import "./AdminStates.css";
 const AdminStats = () => {
   const [stats, setStats] = useState({

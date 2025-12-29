@@ -1,4 +1,4 @@
-import api from "/Users/tanish/web-dev/react/carrental-project/src/components/Axios.jsx";
+import api from "../../Axios.jsx";
 import { useNavigate } from "react-router-dom";
 
 const AddCar = () => {

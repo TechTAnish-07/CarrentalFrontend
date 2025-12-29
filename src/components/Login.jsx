@@ -49,7 +49,7 @@ const Login = () => {
 
       } else {
         // 📝 REGISTER
-        const res = await fetch("http://localhost:8080/auth/register", {
+        const res = await fetch("https://carrentalbackend-h8b3.onrender.com/auth/register", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ email, username, password }),

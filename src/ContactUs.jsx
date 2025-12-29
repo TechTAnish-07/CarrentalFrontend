@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { lazy, useState } from 'react';
 import './ContactUs.css'; // Import the CSS
+import api from './components/Axios.jsx';
 const ContactUs = () => {
   const storedUser = localStorage.getItem("currentUser");
   const currentUser = storedUser ? JSON.parse(storedUser) : null;
@@ -45,28 +46,24 @@ const ContactUs = () => {
       subject: "Contact Form",
       message,
     };
-    try {
-      const res = await fetch("http://localhost:8080/api/contact", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-      if (!res.ok) {
-        throw new Error("Failed to send message");
-      }
+  
+  try {
+    await api.post("/api/contact", payload);
 
-      setSubmitted(true);
-      setStatus('Your message has been "sent"!');
-      setFormData({ name: '', email: '', message: '' });
+    setSubmitted(true);
+    setStatus('Your message has been "sent"!');
+    setFormData({ name: "", email: "", message: "" });
 
-      setTimeout(() => {
-        setSubmitted(false);
-        setStatus('');
-      }, 4000);
-    } catch (error) {
-      setStatus("Something went wrong. Please try again later.");
-    }
-  };
+    setTimeout(() => {
+      setSubmitted(false);
+      setStatus("");
+    }, 4000);
+
+  } catch (error) {
+    console.error(error);
+    setStatus("Something went wrong. Please try again later.");
+  }
+};
 
   return (
 

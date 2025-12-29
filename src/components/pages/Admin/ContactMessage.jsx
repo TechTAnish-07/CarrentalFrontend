@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import api from "/Users/tanish/web-dev/react/carrental-project/src/components/Axios.jsx";
-import AdminLayout from "/Users/tanish/web-dev/react/carrental-project/src/components/AdminLayout.jsx";
+import api from "../../Axios.jsx";
+import AdminLayout from "../../AdminLayout.jsx";
 import "./ContactMessage.css";
 const ContactMessages = () => {
   const [msgs, setMsgs] = useState([]);

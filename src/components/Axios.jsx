@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "http://localhost:8080",
+  baseURL: "https://carrentalbackend-h8b3.onrender.com",
   headers: {
     Accept: "application/json, text/plain, */*",
   },
@@ -78,7 +78,7 @@ api.interceptors.response.use(
         }
 
         const res = await axios.post(
-          "http://localhost:8080/auth/refresh",
+          "https://carrentalbackend-h8b3.onrender.com/auth/refresh",
           { refreshToken }
         );
 
