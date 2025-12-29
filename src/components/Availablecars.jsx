@@ -15,7 +15,7 @@ import "./Availablecars.css";
 const AvailableCars = () => {
   const { search } = useLocation();
   const navigate = useNavigate();
-
+  const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
   const params = new URLSearchParams(search);
   const location = params.get("location");
   const start = params.get("start");
@@ -80,7 +80,16 @@ const AvailableCars = () => {
 
   /* ---------------- BOOK ---------------- */
   const handleBook = (carId) => {
+    if(!isLoggedIn){
+      navigate("/signin");
+       return;
+    }
+    if (!carId) {
+    console.error("Invalid carId:", carId);
+    return;
+  }
     console.log("Booking car:", carId);
+
     navigate(`/book/${carId}?location=${location}&start=${start}&end=${end}`);
   };
 
