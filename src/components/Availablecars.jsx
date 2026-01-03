@@ -31,6 +31,28 @@ const AvailableCars = () => {
     sortBy: "recommended",
   });
 
+  const startDate = new Date(start);
+  const endDate = new Date(end);
+
+  //varialble price 
+  const diffMs = endDate - startDate; // milliseconds
+  const totalHours = diffMs / (1000 * 60 * 60);
+  const calculateTotalAmount = (pricePerDay) => {
+    const diffMs = endDate - startDate;
+    const totalHours = diffMs / (1000 * 60 * 60);
+
+    const pricePerHour = pricePerDay / 24;
+
+    // minimum 1 day
+    let amount = pricePerDay;
+
+    if (totalHours > 24) {
+      amount += (totalHours - 24) * pricePerHour;
+    }
+
+    return Math.ceil(amount); // real-world billing
+  };
+
   /* ---------------- FETCH AVAILABLE CARS ---------------- */
   useEffect(() => {
     if (!location || !start || !end) return;
@@ -80,14 +102,14 @@ const AvailableCars = () => {
 
   /* ---------------- BOOK ---------------- */
   const handleBook = (carId) => {
-    if(!isLoggedIn){
+    if (!isLoggedIn) {
       navigate("/signin");
-       return;
+      return;
     }
     if (!carId) {
-    console.error("Invalid carId:", carId);
-    return;
-  }
+      console.error("Invalid carId:", carId);
+      return;
+    }
     console.log("Booking car:", carId);
 
     navigate(`/book/${carId}?location=${location}&start=${start}&end=${end}`);
@@ -107,8 +129,8 @@ const AvailableCars = () => {
             <Calendar size={18} />{" "}
             {start && end
               ? `${new Date(start).toLocaleDateString()} – ${new Date(
-                  end
-                ).toLocaleDateString()}`
+                end
+              ).toLocaleDateString()}`
               : "Invalid dates"}
           </div>
         </div>
@@ -217,11 +239,16 @@ const AvailableCars = () => {
               )}
 
               <div className="car-footer">
+                <div className="price-box">
                 <div className="price">
                   ₹{car.pricePerDay}
                   <span>/day</span>
-                </div>
 
+                </div>
+                <div className="total-price">
+                   ₹{calculateTotalAmount(car.pricePerDay)}
+                </div>
+              </div>
                 <button onClick={() => handleBook(car.id)}>
                   Book Now
                 </button>
