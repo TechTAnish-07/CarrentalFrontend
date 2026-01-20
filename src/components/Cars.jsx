@@ -17,9 +17,9 @@ function Cars() {
   const fetchCars = async () => {
     try {
       const res = await api.get("/api/cars/display");
-      console.log("API Response:", res.data);
+     // console.log("API Response:", res.data);
       setCarData(res.data);
-      console.log("Fetched car data:", res.data);
+      //console.log("Fetched car data:", res.data);
       setLoaded(true);
 
     } catch (err) {

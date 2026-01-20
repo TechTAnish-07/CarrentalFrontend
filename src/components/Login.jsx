@@ -28,14 +28,12 @@ const handleSubmitButton = async (e) => {
     if (isSignIn) {
       // 🔐 LOGIN (Axios)
       const res = await api.post("/auth/login", { email, password });
-
-      const { accessToken, refreshToken, user } = res.data;
+     const { token: accessToken, refreshToken, user } = res.data;
 
       localStorage.setItem("accessToken", accessToken);
       localStorage.setItem("refreshToken", refreshToken);
       localStorage.setItem("currentUser", JSON.stringify(user));
       localStorage.setItem("isLoggedIn", "true");
-
       const decoded = jwtDecode(accessToken);
       const role = decoded.role;
 

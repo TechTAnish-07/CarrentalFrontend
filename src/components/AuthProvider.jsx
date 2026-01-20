@@ -6,46 +6,73 @@ const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
+  const [role, setRole] = useState(null);
   const [loading, setLoading] = useState(true);
 
   const token = localStorage.getItem("accessToken");
 
-  const decoded = token ? jwtDecode(token) : null;
-  const role = decoded?.role;
+  // ✅ Decode token ONLY in useEffect
+  useEffect(() => {
+    if (!token) {
+      setRole(null);
+      setLoading(false);
+      return;
+    }
+
+    if (token.split(".").length !== 3) {
+      localStorage.removeItem("accessToken");
+      setRole(null);
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const decoded = jwtDecode(token);
+      setRole(decoded?.role);
+    } catch (err) {
+      console.error("Invalid JWT", err);
+      localStorage.removeItem("accessToken");
+      setRole(null);
+    }
+  }, [token]);
 
   const fetchUser = async () => {
     try {
       const res = await api.get("/api/user-detail/me");
-
-      setUser({
-        ...res.data,
-        role,
-      });
-
-      
-      localStorage.setItem(
-        "currentUser",
-        JSON.stringify({ ...res.data, role })
-      );
+      setUser({ ...res.data });
+      localStorage.setItem("currentUser", JSON.stringify(res.data));
     } catch {
-      setUser(null);
-      localStorage.clear();
+      logout();
     } finally {
       setLoading(false);
     }
   };
 
+  // ✅ fetch user AFTER role is resolved
   useEffect(() => {
-    if (token) fetchUser();
-    else setLoading(false);
-  }, [token]);
+    if (token && role) {
+      fetchUser();
+    }
+  }, [token, role]);
+
+  const logout = () => {
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("refreshToken");
+    localStorage.removeItem("currentUser");
+    setUser(null);
+    setRole(null);
+    setLoading(false);
+    window.location.href = "/signin";
+  };
 
   return (
     <AuthContext.Provider
       value={{
         user,
+        role,
         loading,
         fetchUser,
+        logout,
         isAdmin: role === "ROLE_ADMIN",
         isUser: role === "ROLE_USER",
       }}
