@@ -17,12 +17,11 @@ import {
   AlertCircle,
 } from "lucide-react";
 import "./Profile.css";
-import { jwtDecode } from "jwt-decode";
 import { useAuth } from "./AuthProvider";
 
 const Profile = () => {
   const { user, fetchUser, isUser } = useAuth();
-  const profile = user; 
+
   const [editing, setEditing] = useState(false);
   const [formData, setFormData] = useState({ phone: "", address: "" });
   const [aadhaar, setAadhaar] = useState(null);
@@ -32,7 +31,13 @@ const Profile = () => {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   const fileInputRef = useRef(null);
- 
+
+  /* ================= FETCH USER ON REFRESH ================= */
+  useEffect(() => {
+    if (!user) {
+      fetchUser();
+    }
+  }, []); // 👈 important
 
   /* ================= UPDATE DETAILS ================= */
   const saveDetails = async () => {
@@ -77,7 +82,6 @@ const Profile = () => {
       data.append("profileImage", profileImage);
 
       await api.post("/api/user-detail/profile-image", data);
-
       setProfileImage(null);
       await fetchUser();
       alert("Profile image uploaded successfully");
@@ -85,6 +89,7 @@ const Profile = () => {
       alert("Profile image upload failed");
     } finally {
       setLoading(false);
+;
     }
   };
 
@@ -113,22 +118,6 @@ const Profile = () => {
     }
   };
 
-  /* ================= REMOVE KYC ================= */
-  const removeKyc = async (type) => {
-    if (!window.confirm("Remove this document?")) return;
-
-    try {
-      if (type === "aadhaar") {
-        await api.delete("/api/user-detail/kyc/aadhaar");
-      } else {
-        await api.delete("/api/user-detail/kyc/driving-license");
-      }
-      fetchProfile();
-    } catch {
-      alert("Failed to remove document");
-    }
-  };
-
   /* ================= LOGOUT ================= */
   const logout = () => {
     localStorage.clear();
@@ -146,7 +135,10 @@ const Profile = () => {
     }
   };
 
-  if (!profile) return <p className="loading">Loading profile...</p>;
+  /* ================= LOADING STATE ================= */
+  if (!user) {
+    return <p className="loading">Loading profile...</p>;
+  }
 
   return (
     <div className="profile-page">
@@ -154,8 +146,8 @@ const Profile = () => {
       <div className="profile-header">
         <div className="header-content">
           <div className="profile-pic">
-            {profile.imageUrl ? (
-              <img src={profile.imageUrl} alt="Profile" className="profile-img" />
+            {user.imageUrl ? (
+              <img src={user.imageUrl} alt="Profile" className="profile-img" />
             ) : (
               <User size={56} />
             )}
@@ -174,10 +166,10 @@ const Profile = () => {
           </div>
 
           <div className="header-info">
-            <h1>{profile.name}</h1>
+            <h1>{user.name}</h1>
             <div className="header-meta">
               <span>
-                <Mail size={16} /> {profile.email}
+                <Mail size={16} /> {user.email}
               </span>
             </div>
             <div className="badge">
@@ -233,8 +225,8 @@ const Profile = () => {
                   </>
                 ) : (
                   <>
-                    <p><Phone /> {profile.phone || "Not provided"}</p>
-                    <p><MapPin /> {profile.address || "Not provided"}</p>
+                    <p><Phone /> {user.phone || "Not provided"}</p>
+                    <p><MapPin /> {user.address || "Not provided"}</p>
                   </>
                 )}
               </div>
@@ -268,7 +260,6 @@ const Profile = () => {
           <div className="right-column">
             <div className="card danger">
               <h3><Shield /> Security</h3>
-
               <button className="btn secondary full" onClick={logout}>Logout</button>
 
               {!showDeleteConfirm ? (
